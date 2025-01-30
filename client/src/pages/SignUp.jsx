@@ -70,7 +70,7 @@ export default function SignUp() {
               />
             </div>
             <Button
-              className="bg-gradient-to-r from-amber-100 to-amber-200 text-white hover:bg-gradient-to-l from-amber-500 to-amber-400"
+              className="bg-gradient-to-t from-amber-100 to-amber-200 text-white hover:bg-gradient-to-l from-amber-500 to-amber-400"
               type="submit"
               disabled={loading}
             >

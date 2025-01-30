@@ -3,20 +3,24 @@ import { errorHandler } from '../utils/error.js';
 
 export const create = async (req, res, next) => {
   if (!req.user.isAdmin) {
-    return next(errorHandler(403, 'You are not allowed to create a post'));
+    return next(errorHandler(403, "You are not allowed to create a post"));
   }
   if (!req.body.title || !req.body.content) {
-    return next(errorHandler(400, 'Please provide all required fields'));
+    return next(errorHandler(400, "Please provide all required fields"));
   }
   const slug = req.body.title
-    .split(' ')
-    .join('-')
+    .split(" ")
+    .join("-")
     .toLowerCase()
-    .replace(/[^a-zA-Z0-9-]/g, '');
+    .replace(/[^a-zA-Z0-9-]/g, "");
+  const baseUrl = `http://localhost:3000`;
+  const imageUrl = req.file ? `${baseUrl}/uploads/${req.file.filename}` : "";
+
   const newPost = new Post({
     ...req.body,
     slug,
     userId: req.user.id,
+    image: imageUrl,
   });
   try {
     const savedPost = await newPost.save();
