@@ -122,7 +122,7 @@ export default function CommentSection({ postId }) {
           />
           <Link
             to={"/dashboard?tab=profile"}
-            className="text-xs text-cyan-600 hover:underline"
+            className="text-xs text-amber-300 hover:underline"
           >
             @{currentUser.username}
           </Link>
@@ -130,7 +130,7 @@ export default function CommentSection({ postId }) {
       ) : (
         <div className="text-sm text-amber-500 my-5 flex gap-1">
           You must be signed in to comment.
-          <Link className="text-blue-500 hover:underline" to={"/sign-in"}>
+          <Link className="text-amber-500 hover:underline" to={"/sign-in"}>
             Sign In
           </Link>
         </div>
@@ -146,7 +146,9 @@ export default function CommentSection({ postId }) {
             maxLength="200"
             onChange={(e) => setComment(e.target.value)}
             value={comment}
+            className="bg-gray-50 border border-gray-300 text-gray-900 focus:border-amber-500 focus:ring-amber-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-white dark:focus:border-amber-400 dark:focus:ring-amber-400 p-2 rounded-md w-full"
           />
+
           <div className="flex justify-between items-center mt-5">
             <p className="text-gray-500 text-xs">
               {200 - comment.length} characters remaining
