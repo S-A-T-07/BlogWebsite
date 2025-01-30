@@ -47,7 +47,7 @@ export default function SignIn() {
     <div className="min-h-screen">
       <div className=" flex p-3 max-w-3xl mx-auto flex-col md:flex-row md:items-center gap-5">
         <div className="flex-1">
-          <form className="mt-10 flex flex-col gap-4" onSubmit={handleSubmit}>
+          <form className="mt-20 flex flex-col gap-4" onSubmit={handleSubmit}>
             <div>
               <Label value="Your email" />
               <TextInput
