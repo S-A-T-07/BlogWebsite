@@ -31,12 +31,16 @@ export default function DashProfile() {
   const filePickerRef = useRef();
   const dispatch = useDispatch();
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setImageFile(file);
-    }
-  };
+ const handleImageChange = (e) => {
+   const file = e.target.files[0];
+   if (file) {
+     setImageFile(file);
+     const formData = new FormData();
+     formData.append("image", file); // 'image' should match the field name in the backend
+     uploadImage(formData); // Pass formData to uploadImage function
+   }
+ };
+
 
   useEffect(() => {
     if (imageFile) {
@@ -44,39 +48,27 @@ export default function DashProfile() {
     }
   }, [imageFile]);
 
-  const uploadImage = async () => {
-    setImageFileUploading(true);
-    setImageFileUploadError(null);
-
-    // Prepare FormData for Pixhost API
-    const formData = new FormData();
-    formData.append("file", imageFile);
-
-    // Send image to Pixhost API (adjust the URL to match Pixhost's API documentation)
+  const uploadImage = async (formData) => {
     try {
-      const response = await axios.post(
-        "https://api.pixhost.to/images",
-        formData,
-        {
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+      const response = await fetch("http://localhost:3000/api/upload", {
+        method: "POST",
+        body: formData,
+      });
 
-      if (response.data.success) {
-        setImageFileUrl(response.data.data.url); // Adjust this based on Pixhost's response format
-        setFormData({ ...formData, profilePicture: response.data.data.url });
-      } else {
-        setImageFileUploadError("Error uploading image");
+      if (!response.ok) {
+        throw new Error("Upload failed");
       }
+
+      const data = await response.json();
+      console.log(data); // Log data or handle success
+      // If you want to set the uploaded image URL
+      setImageFileUrl(data.filePath);
     } catch (error) {
-      setImageFileUploadError("Could not upload image. Please try again.");
-    } finally {
-      setImageFileUploading(false);
+      console.error("Error:", error);
+      setImageFileUploadError("Failed to upload image.");
     }
   };
+
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });

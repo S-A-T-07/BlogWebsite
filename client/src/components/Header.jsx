@@ -75,14 +75,7 @@ export default function Header() {
         <AiOutlineSearch />
       </Button>
       <div className="flex gap-2 md:order-2">
-        <Button
-          className="w-12 h-10 hidden sm:inline hover:bg-gradient-to-r hover:from-amber-400 hover:to-amber-500 hover:text-white outline focus:ring-amber-500 focus:outline-none"
-          color="gray"
-          pill
-          onClick={() => dispatch(toggleTheme())}
-        >
-          {theme === "light" ? <FaSun /> : <FaMoon />}
-        </Button>
+        
         {currentUser ? (
           <Dropdown
             arrowIcon={false}
