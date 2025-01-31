@@ -9,7 +9,7 @@ import cookieParser from "cookie-parser";
 import path from "path";
 import cors from "cors";
 import multer from "multer";
-import uploadsRoute from "./routes/uploads.route.js"; // Corrected import path
+// import uploadsRoute from "./routes/uploads.route.js"; // Corrected import path
 
 
 dotenv.config({ path: "./.env" });
@@ -73,7 +73,7 @@ app.use("/api/user", userRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/post", postRoutes);
 app.use("/api/comment", commentRoutes);
-app.use("/api/upload", uploadsRoute);
+// app.use("/api/upload", uploadsRoute);
 app.use("/uploads", express.static("uploads"));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
