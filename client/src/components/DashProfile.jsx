@@ -35,77 +35,92 @@ export default function DashProfile() {
    const file = e.target.files[0];
    if (file) {
      setImageFile(file);
-     const formData = new FormData();
-     formData.append("image", file); // 'image' should match the field name in the backend
-     uploadImage(formData); // Pass formData to uploadImage function
+     setImageFileUrl(URL.createObjectURL(file)); // Preview the image
    }
  };
 
 
-  useEffect(() => {
-    if (imageFile) {
-      uploadImage();
-    }
-  }, [imageFile]);
+  // useEffect(() => {
+  //   if (imageFile) {
+  //     uploadImage();
+  //   }
+  // }, [imageFile]);
 
-  const uploadImage = async (formData) => {
-    try {
-      const response = await fetch("http://localhost:3000/api/upload", {
-        method: "POST",
-        body: formData,
-      });
+  // const uploadImage = async (formData) => {
+  //   try {
+  //     const response = await fetch("http://localhost:3000/api/upload", {
+  //       method: "POST",
+  //       body: formData,
+  //     });
 
-      if (!response.ok) {
-        throw new Error("Upload failed");
-      }
+  //     if (!response.ok) {
+  //       throw new Error("Upload failed");
+  //     }
 
-      const data = await response.json();
-      console.log(data); // Log data or handle success
-      // If you want to set the uploaded image URL
-      setImageFileUrl(data.filePath);
-    } catch (error) {
-      console.error("Error:", error);
-      setImageFileUploadError("Failed to upload image.");
-    }
-  };
+  //     const data = await response.json();
+  //     console.log(data); // Log data or handle success
+  //     // If you want to set the uploaded image URL
+  //     setImageFileUrl(data.filePath);
+  //   } catch (error) {
+  //     console.error("Error:", error);
+  //     setImageFileUploadError("Failed to upload image.");
+  //   }
+  // };
 
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
 
+  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     setUpdateUserError(null);
     setUpdateUserSuccess(null);
-    if (Object.keys(formData).length === 0) {
+
+    // Check if no changes were made
+    if (Object.keys(formData).length === 0 && !imageFile) {
       setUpdateUserError("No changes made");
       return;
     }
-    if (imageFileUploading) {
-      setUpdateUserError("Please wait for image to upload");
-      return;
-    }
+
     try {
       dispatch(updateStart());
-      const res = await fetch(`/api/user/update/${currentUser._id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        dispatch(updateFailure(data.message));
-        setUpdateUserError(data.message);
-      } else {
-        dispatch(updateSuccess(data));
+      const formDataToSend = new FormData();
+
+      if (formData.username)
+        formDataToSend.append("username", formData.username);
+      if (formData.email) formDataToSend.append("email", formData.email);
+      if (formData.password)
+        formDataToSend.append("password", formData.password);
+      if (imageFile) {
+        formDataToSend.append("profilePicture", imageFile);
+      }
+
+      for (let [key, value] of formDataToSend.entries()) {
+        console.log(key, value);
+      }
+      const res = await axios.put(
+        `/api/user/update/${currentUser._id}`,
+        formDataToSend,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      if (res.status === 200) {
+        dispatch(updateSuccess(res.data));
         setUpdateUserSuccess("User's profile updated successfully");
+        setImageFile(null); // Reset image file after successful update
+      } else {
+        dispatch(updateFailure(res.data.message));
+        setUpdateUserError(res.data.message);
       }
     } catch (error) {
-      dispatch(updateFailure(error.message));
-      setUpdateUserError(error.message);
+      dispatch(updateFailure(error.response?.data?.message || error.message));
+      setUpdateUserError(error.response?.data?.message || error.message);
     }
   };
 

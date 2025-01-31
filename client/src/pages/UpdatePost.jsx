@@ -6,8 +6,11 @@ import { CircularProgressbar } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 import { useNavigate, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
+import axios from "axios";
 
 export default function UpdatePost() {
+  const [imageFile, setImageFile] = useState(null);
+  const [imageFileUrl, setImageFileUrl] = useState(null);
   const [file, setFile] = useState(null);
   const [imageUploadProgress, setImageUploadProgress] = useState(null);
   const [imageUploadError, setImageUploadError] = useState(null);
@@ -38,61 +41,104 @@ export default function UpdatePost() {
     fetchPost();
   }, [postId]);
 
-  const handleUploadImage = async () => {
-    try {
-      if (!file) {
-        setImageUploadError("Please select an image");
-        return;
-      }
-      setImageUploadError(null);
-
-      // Prepare form data for the image upload request
-      const formDataUpload = new FormData();
-      formDataUpload.append("image", file);
-
-      // Send a POST request to your server to upload the image using Multer
-      const res = await fetch("/api/uploads/upload", {
-        method: "POST",
-        body: formDataUpload,
-      });
-
-      const data = await res.json();
-      if (!res.ok) {
-        console.error("Image upload failed:", data.message);
-        setImageUploadError("Image upload failed");
-        return;
-      }
-
-      setFormData((prevData) => ({ ...prevData, image: data.imageUrl }));
-      setImageUploadProgress(null); // Reset progress
-    } catch (error) {
-      console.error("Image upload error:", error);
-      setImageUploadError("Image upload failed");
-      setImageUploadProgress(null);
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImageFile(file);
+      setImageFileUrl(URL.createObjectURL(file)); // Preview the image
     }
   };
+
+  // const handleUploadImage = async () => {
+  //   try {
+  //     if (!file) {
+  //       setImageUploadError("Please select an image");
+  //       return;
+  //     }
+  //     setImageUploadError(null);
+
+  //     // Prepare form data for the image upload request
+  //     const formDataUpload = new FormData();
+  //     formDataUpload.append("image", file);
+
+  //     // Send a POST request to your server to upload the image using Multer
+  //     const res = await fetch("/api/uploads/upload", {
+  //       method: "POST",
+  //       body: formDataUpload,
+  //     });
+
+  //     const data = await res.json();
+  //     if (!res.ok) {
+  //       console.error("Image upload failed:", data.message);
+  //       setImageUploadError("Image upload failed");
+  //       return;
+  //     }
+
+  //     setFormData((prevData) => ({ ...prevData, image: data.imageUrl }));
+  //     setImageUploadProgress(null); // Reset progress
+  //   } catch (error) {
+  //     console.error("Image upload error:", error);
+  //     setImageUploadError("Image upload failed");
+  //     setImageUploadProgress(null);
+  //   }
+  // };
+
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   const formDataToSend = new FormData();
+  //   try {
+  //     const res = await fetch(
+  //       `/api/post/updatepost/${formData._id}/${currentUser._id}`,
+  //       {
+  //         method: "PUT",
+  //         headers: { "Content-Type": "application/json" },
+  //         body: JSON.stringify(formData),
+  //       }
+  //     );
+  //     const data = await res.json();
+  //     if (!res.ok) {
+  //       console.error("Update post error:", data.message);
+  //       setPublishError(data.message);
+  //       return;
+  //     }
+  //     setPublishError(null);
+  //     navigate(`/post/${data.slug}`);
+  //   } catch (error) {
+  //     console.error("Submit error:", error);
+  //     setPublishError("Something went wrong");
+  //   }
+  // };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch(
+      const formDataToSend = new FormData();
+      if (formData.title) formDataToSend.append("title", formData.title);
+      if (formData.content) formDataToSend.append("content", formData.content);
+      if (imageFile) formDataToSend.append("image", imageFile);
+
+      for (let [key, value] of formDataToSend.entries()) {
+        console.log(key, value);
+      }
+
+      const res = await axios.put(
         `/api/post/updatepost/${formData._id}/${currentUser._id}`,
+        formDataToSend,
         {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData),
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
         }
       );
-      const data = await res.json();
-      if (!res.ok) {
-        console.error("Update post error:", data.message);
-        setPublishError(data.message);
+      console.log(res.data);
+      if (res.status === 200 || res.status === 201) {
+        setPublishError(null);
+        navigate(`/post/${res.data.slug}`);
+      } else {
+        setPublishError(res.data.message || "Something went wrong");
         return;
       }
-      setPublishError(null);
-      navigate(`/post/${data.slug}`);
     } catch (error) {
-      console.error("Submit error:", error);
       setPublishError("Something went wrong");
     }
   };
@@ -129,9 +175,9 @@ export default function UpdatePost() {
           <FileInput
             type="file"
             accept="image/*"
-            onChange={(e) => setFile(e.target.files[0])}
+            onChange={handleImageChange}
           />
-          <Button
+          {/* <Button
             type="button"
             className="bg-gradient-to-r from-amber-500 to-amber-600 text-white w-full"
             size="sm"
@@ -149,12 +195,12 @@ export default function UpdatePost() {
             ) : (
               "Upload Image"
             )}
-          </Button>
+          </Button> */}
         </div>
         {imageUploadError && <Alert color="failure">{imageUploadError}</Alert>}
         {formData.image && (
           <img
-            src={formData.image}
+            src={formData.image || imageFileUrl}
             alt="Uploaded preview"
             className="w-full h-72 object-cover"
           />
