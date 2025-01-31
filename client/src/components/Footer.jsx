@@ -8,7 +8,7 @@ import {
   BsDribbble,
   BsLinkedin,
 } from "react-icons/bs";
-import Logo from "../assets/logo.png"; // Importing the logo
+import Logo from "../assets/Logo.png"; // Importing the logo
 
 export default function FooterCom() {
   return (
