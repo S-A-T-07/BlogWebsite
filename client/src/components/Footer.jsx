@@ -24,11 +24,10 @@ export default function FooterCom() {
             </Link>
           </div>
 
-            <Footer.LinkGroup className="mt-8">
-              <Footer.Link href="#">Privacy Policy</Footer.Link>
-              <Footer.Link href="#">Terms &amp; Conditions</Footer.Link>
-            </Footer.LinkGroup>
-          
+          <Footer.LinkGroup className="mt-8">
+            <Footer.Link href="#">Privacy Policy</Footer.Link>
+            <Footer.Link href="#">Terms &amp; Conditions</Footer.Link>
+          </Footer.LinkGroup>
         </div>
         <Footer.Divider />
         <div className="w-full sm:flex sm:items-center sm:justify-between">
@@ -38,11 +37,11 @@ export default function FooterCom() {
             year={new Date().getFullYear()}
           />
           <div className="flex gap-6 sm:mt-0 mt-4 sm:justify-center">
-            <Footer.Icon href="#" icon={BsLinkedin} />
             <Footer.Icon
-              href="https://github.com/sahandghavidel"
-              icon={BsGithub}
+              href="https://www.linkedin.com/in/soumya-annie-thomas-099255214/"
+              icon={BsLinkedin}
             />
+            <Footer.Icon href="https://github.com/S-A-T-07" icon={BsGithub} />
           </div>
         </div>
       </div>
